@@ -7,7 +7,7 @@ from datetime import datetime
 import pytz
 import asyncio
 
-# โหลดตัวแปรจาก environment ของ Railway
+# โหลดตัวแปรจาก environment (Railway หรือ Local .env)
 TOKEN = os.getenv("DISCORD_TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 
@@ -15,7 +15,10 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+# Timezone
 tz = pytz.timezone("Asia/Bangkok")
+
+# Scheduler
 scheduler = AsyncIOScheduler(timezone=tz)
 
 # ข้อความและ Activity ของแต่ละหมวด
@@ -39,7 +42,7 @@ MESSAGES = {
 # Activity ตอนรอส่งข้อความ
 WAITING_ACTIVITY = "อ้ายบุญโฮมกำลังนั่งเบิ่งคุณ... 👀"
 
-# URL Twitch / YouTube สำหรับ Streaming Activity
+# URL สำหรับ Streaming Activity
 STREAM_URL = "https://www.twitch.tv/boonhomelive"
 
 # ฟังก์ชันตั้ง Activity แบบ Streaming
@@ -64,12 +67,6 @@ async def send_message(category: str):
 
     # กลับไป Activity ตอนรอส่งข้อความ
     await set_activity(WAITING_ACTIVITY)
-
-# ตั้ง scheduler
-for cat, info in MESSAGES.items():
-    for t in info["times"]:
-        hour, minute = map(int, t.split(":"))
-        scheduler.add_job(send_message, CronTrigger(hour=hour, minute=minute), args=[cat])
 
 # คำสั่ง Discord
 @bot.command()
@@ -102,13 +99,26 @@ async def next(ctx, category: str = None):
 async def status(ctx):
     await ctx.send(f"✅ บอททำงานอยู่ตอนนี้ ({datetime.now(tz).strftime('%H:%M:%S %d/%m/%Y')})")
 
+# เมื่อ bot พร้อม
 @bot.event
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
 
-    # ตั้ง Activity ตอนรอส่งข้อความ
+    # ตั้ง Activity ตอนรอ
     await set_activity(WAITING_ACTIVITY)
     print(f"🎮 Bot Streaming activity set: {WAITING_ACTIVITY}")
+
+    # ตั้ง scheduler หลัง bot พร้อม
+    for cat, info in MESSAGES.items():
+        for t in info["times"]:
+            hour, minute = map(int, t.split(":"))
+            scheduler.add_job(
+                send_message,
+                trigger=CronTrigger(hour=hour, minute=minute, timezone=tz),
+                args=[cat],
+                coalesce=True,
+                misfire_grace_time=60
+            )
 
     scheduler.start()
     print("🕒 Scheduler started. Waiting for next job...")
