@@ -18,6 +18,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 tz = pytz.timezone("Asia/Bangkok")
 scheduler = AsyncIOScheduler(timezone=tz)
 
+# ข้อความและ Activity ของแต่ละหมวด
 MESSAGES = {
     "vehicle": {
         "text": "# แจ้งเตือนลบยานพาหนะ\nชาวเมืองทุกท่านอย่าลืมขึ้นยานพาหนะของท่านนะครับ <@&1419750622517006393>",
@@ -38,13 +39,19 @@ MESSAGES = {
 # Activity ตอนรอส่งข้อความ
 WAITING_ACTIVITY = "อ้ายบุญโฮมกำลังนั่งเบิ่งคุณ... 👀"
 
-async def set_activity(text):
-    await bot.change_presence(activity=discord.Game(name=text))
+# URL Twitch / YouTube สำหรับ Streaming Activity
+STREAM_URL = "https://www.twitch.tv/boonhomelive"
 
+# ฟังก์ชันตั้ง Activity แบบ Streaming
+async def set_activity(text, url=STREAM_URL):
+    await bot.change_presence(activity=discord.Streaming(name=text, url=url))
+
+# ฟังก์ชันส่งข้อความและเปลี่ยน Activity
 async def send_message(category: str):
     data = MESSAGES.get(category)
     if not data:
         return
+
     # เปลี่ยน Activity ตามหมวด
     await set_activity(data["activity"])
 
@@ -98,11 +105,11 @@ async def status(ctx):
 @bot.event
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
-    
+
     # ตั้ง Activity ตอนรอส่งข้อความ
     await set_activity(WAITING_ACTIVITY)
-    print(f"🎮 Bot activity set: {WAITING_ACTIVITY}")
-    
+    print(f"🎮 Bot Streaming activity set: {WAITING_ACTIVITY}")
+
     scheduler.start()
     print("🕒 Scheduler started. Waiting for next job...")
 
