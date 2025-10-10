@@ -84,6 +84,11 @@ async def status(ctx):
 @bot.event
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
+    
+    # ตั้ง Activity / Playing Status ของ Bot
+    await bot.change_presence(activity=discord.Game(name="อ้ายบุญโฮมกำลังนั่งเบิ่งคุณ..."))
+    print("🎮 Bot activity set: กำลังนั่งเบิ่ง")
+    
     scheduler.start()
     print("🕒 Scheduler started. Waiting for next job...")
 
