@@ -2,9 +2,12 @@ import os
 import discord
 from discord.ext import commands
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from dotenv import load_dotenv
+from apscheduler.triggers.cron import CronTrigger
+from datetime import datetime
+import pytz
+import asyncio
 
-load_dotenv()
+# โหลดตัวแปรจาก environment ของ Railway
 TOKEN = os.getenv("DISCORD_TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 
@@ -12,13 +15,9 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# ตั้งค่า timezone เป็นเวลาไทย
 tz = pytz.timezone("Asia/Bangkok")
-
-# ตั้งค่า Scheduler
 scheduler = AsyncIOScheduler(timezone=tz)
 
-# ข้อความและรูปแบบหมวดหมู่
 MESSAGES = {
     "vehicle": {
         "text": "# แจ้งเตือนลบยานพาหนะ\nชาวเมืองทุกท่านอย่าลืมขึ้นยานพาหนะของท่านนะครับ <@&1419750622517006393>",
@@ -28,29 +27,24 @@ MESSAGES = {
     },
     "Airdrop": {
         "text": "# แจ้งเตือนเข้า Airdrop ครับเพื่อนๆ\nชาวเมืองทุกท่านระวังโดนปรับนะครับ <@&1419750622517006393> <@&1419750622517006394>",
-        "image": "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2UyeWl2aXVjemQ5ZHpxaDQ4M3MwdzI4ZG5xaGVpb3djNDRrN2R4MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ne3qb8GHvteK4QGtbs/giphy.gif",
+        "image": "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2UyeWl2aXVjemQ5ZHpxaDQ4M3MwdzI4ZG5xaGVpb3djNDRrN2R4MyZlcD12MV9pbnRlcm5hbF9naWQmY3Q9Zw/ne3qb8GHvteK4QGtbs/giphy.gif",
         "times": ["19:45", "19:55", "22:45", "22:55"],
         "color": 0xff5858
     },
 }
 
-
-# ฟังก์ชันส่งข้อความหมวดหมู่
 async def send_message(category: str):
     data = MESSAGES.get(category)
     if not data:
         return
     channel = bot.get_channel(CHANNEL_ID)
     if channel:
-        embed = discord.Embed(
-            description=data["text"],
-            color=data["color"]  # ใช้สีจาก MESSAGES
-        )
+        embed = discord.Embed(description=data["text"], color=data["color"])
         embed.set_image(url=data["image"])
         await channel.send(embed=embed)
         print(f"[{datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S')}] ✅ Message sent ({category}) to {channel.name}")
 
-# เพิ่มตารางเวลาอัตโนมัติจากทุกหมวด
+# ตั้ง scheduler
 for cat, info in MESSAGES.items():
     for t in info["times"]:
         hour, minute = map(int, t.split(":"))
@@ -59,7 +53,6 @@ for cat, info in MESSAGES.items():
 # คำสั่ง Discord
 @bot.command()
 async def sendnow(ctx, category: str = "vehicle"):
-    """ส่งข้อความแจ้งเตือนทันที"""
     if category not in MESSAGES:
         await ctx.send(f"❌ หมวด '{category}' ไม่มีอยู่")
         return
@@ -68,7 +61,6 @@ async def sendnow(ctx, category: str = "vehicle"):
 
 @bot.command()
 async def next(ctx, category: str = None):
-    """ดูเวลาส่งข้อความถัดไป"""
     now = datetime.now(tz)
     jobs = scheduler.get_jobs()
     upcoming = []
@@ -87,10 +79,8 @@ async def next(ctx, category: str = None):
 
 @bot.command()
 async def status(ctx):
-    """ตรวจสอบว่ายังทำงานอยู่ไหม"""
     await ctx.send(f"✅ บอททำงานอยู่ตอนนี้ ({datetime.now(tz).strftime('%H:%M:%S %d/%m/%Y')})")
 
-# เมื่อบอทเริ่มทำงาน
 @bot.event
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
