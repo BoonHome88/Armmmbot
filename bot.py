@@ -23,26 +23,40 @@ MESSAGES = {
         "text": "# แจ้งเตือนลบยานพาหนะ\nชาวเมืองทุกท่านอย่าลืมขึ้นยานพาหนะของท่านนะครับ <@&1419750622517006393>",
         "image": "https://img5.pic.in.th/file/secure-sv1/ddb3485e9cd775cf7f.jpg",
         "times": ["10:28", "14:28", "22:28", "03:28"],
-        "color": 0xffb658
+        "color": 0xffb658,
+        "activity": "กำลังจะลบรถนะครับทุกคน 🚗"
     },
     "Airdrop": {
         "text": "# แจ้งเตือนเข้า Airdrop ครับเพื่อนๆ\nชาวเมืองทุกท่านระวังโดนปรับนะครับ <@&1419750622517006393> <@&1419750622517006394>",
         "image": "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2UyeWl2aXVjemQ5ZHpxaDQ4M3MwdzI4ZG5xaGVpb3djNDRrN2R4MyZlcD12MV9pbnRlcm5hbF9naWQmY3Q9Zw/ne3qb8GHvteK4QGtbs/giphy.gif",
         "times": ["19:45", "19:55", "22:45", "22:55"],
-        "color": 0xff5858
+        "color": 0xff5858,
+        "activity": "กำลังรอสมาชิกเข้าแอร์ดรอปนะครับ 😎"
     },
 }
+
+# Activity ตอนรอส่งข้อความ
+WAITING_ACTIVITY = "อ้ายบุญโฮมกำลังนั่งเบิ่งคุณ... 👀"
+
+async def set_activity(text):
+    await bot.change_presence(activity=discord.Game(name=text))
 
 async def send_message(category: str):
     data = MESSAGES.get(category)
     if not data:
         return
+    # เปลี่ยน Activity ตามหมวด
+    await set_activity(data["activity"])
+
     channel = bot.get_channel(CHANNEL_ID)
     if channel:
         embed = discord.Embed(description=data["text"], color=data["color"])
         embed.set_image(url=data["image"])
         await channel.send(embed=embed)
         print(f"[{datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S')}] ✅ Message sent ({category}) to {channel.name}")
+
+    # กลับไป Activity ตอนรอส่งข้อความ
+    await set_activity(WAITING_ACTIVITY)
 
 # ตั้ง scheduler
 for cat, info in MESSAGES.items():
@@ -85,9 +99,9 @@ async def status(ctx):
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
     
-    # ตั้ง Activity / Playing Status ของ Bot
-    await bot.change_presence(activity=discord.Game(name="อ้ายบุญโฮมกำลังนั่งเบิ่งคุณ..."))
-    print("🎮 Bot activity set: กำลังนั่งเบิ่ง")
+    # ตั้ง Activity ตอนรอส่งข้อความ
+    await set_activity(WAITING_ACTIVITY)
+    print(f"🎮 Bot activity set: {WAITING_ACTIVITY}")
     
     scheduler.start()
     print("🕒 Scheduler started. Waiting for next job...")
