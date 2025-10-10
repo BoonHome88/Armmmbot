@@ -2,17 +2,12 @@ import os
 import discord
 from discord.ext import commands
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
-from datetime import datetime
-import pytz
 
-# โหลดตัวแปรจาก .env
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 
-# กำหนด intents และตั้งค่า bot
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
