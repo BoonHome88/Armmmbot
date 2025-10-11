@@ -64,9 +64,9 @@ async def on_member_join(member):
     channel = bot.get_channel(JOIN_CHANNEL_ID or CHANNEL_ID)
     if channel:
         embed = discord.Embed(
-            title="🎉 สมาชิกใหม่เข้าร่วมเซิร์ฟเวอร์!",
+            title="🎉 มีสมาชิกใหม่เข้าร่วมเซิร์ฟเวอร์!",
             description=f"ยินดีต้อนรับ {member.mention} เข้าสู่ **{member.guild.name}** 💫",
-            color=0x57F287,
+            color=0x66FF66,
             timestamp=datetime.now(tz)
         )
         embed.set_thumbnail(url=member.display_avatar.url)
@@ -79,7 +79,7 @@ async def on_member_remove(member):
     channel = bot.get_channel(LEAVE_CHANNEL_ID or CHANNEL_ID)
     if channel:
         embed = discord.Embed(
-            title="👋 สมาชิกออกจากเซิร์ฟเวอร์",
+            title="👋 มีสมาชิกออกจากเซิร์ฟเวอร์",
             description=f"{member.name} ได้ออกจาก **{member.guild.name}**",
             color=0xED4245,
             timestamp=datetime.now(tz)
