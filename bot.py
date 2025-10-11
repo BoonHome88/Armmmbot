@@ -43,7 +43,7 @@ MESSAGES = {
 WAITING_ACTIVITY = "@OSM168 💰"
 
 # URL สำหรับ Streaming Activity
-STREAM_URL = "https://www.twitch.tv/boonhomelive"
+STREAM_URL = "https://line.me/R/ti/p/@280xnwmg"
 
 # ฟังก์ชันตั้ง Activity แบบ Streaming
 async def set_activity(text, url=STREAM_URL):
