@@ -7,69 +7,88 @@ from datetime import datetime
 import pytz
 import asyncio
 
-# โหลดตัวแปรจาก environment (Railway หรือ Local .env)
+# โหลดค่าจาก Environment ของ Railway
 TOKEN = os.getenv("DISCORD_TOKEN")
-CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
+CHANNEL_ID = int(os.getenv("CHANNEL_ID"))                # ช่องสำหรับข้อความอัตโนมัติ (vehicle / Airdrop)
+JOIN_CHANNEL_ID = int(os.getenv("JOIN_CHANNEL_ID", 0))   # ✅ ช่องสำหรับแจ้ง "เข้าเซิร์ฟเวอร์"
+LEAVE_CHANNEL_ID = int(os.getenv("LEAVE_CHANNEL_ID", 0)) # ✅ ช่องสำหรับแจ้ง "ออกเซิร์ฟเวอร์"
 
+# เปิด intents สำหรับตรวจจับสมาชิก
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Timezone
 tz = pytz.timezone("Asia/Bangkok")
-
-# Scheduler
 scheduler = AsyncIOScheduler(timezone=tz)
 
-# ข้อความและ Activity ของแต่ละหมวด
 MESSAGES = {
     "vehicle": {
         "text": "# แจ้งเตือนลบยานพาหนะ\n**ชาวเมืองทุกท่านอย่าลืมขึ้นยานพาหนะของท่านนะครับ**\n<@&1419750622517006393> <@&1419750622517006394>",
-        "image": "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmdhczI2dHVrZnQ0a2wzeXJkbXd3YXBtYTVmMzZseGJrN3Nka3NhMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/feOLsVVsYft04/giphy.gif",
+        "image": "https://media1.giphy.com/media/feOLsVVsYft04/giphy.gif",
         "times": ["10:30", "14:30", "22:30", "03:30"],
         "color": 0xffb658,
         "activity": "กำลังจะลบรถนะครับทุกคน 🚗"
     },
     "Airdrop": {
         "text": "# แจ้งเตือนเข้า Airdrop ครับเพื่อนๆ\n**ชาวเมืองทุกท่านระวังโดนปรับนะครับ**\n<@&1419750622517006393> <@&1419750622517006394>",
-        "image": "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2UyeWl2aXVjemQ5ZHpxaDQ4M3MwdzI4ZG5xaGVpb3djNDRrN2R4MyZlcD12MV9pbnRlcm5hbF9naWQmY3Q9Zw/ne3qb8GHvteK4QGtbs/giphy.gif",
+        "image": "https://media2.giphy.com/media/ne3qb8GHvteK4QGtbs/giphy.gif",
         "times": ["19:55", "20:00", "22:55", "23:00"],
         "color": 0xff5858,
         "activity": "กำลังรอสมาชิกเข้าแอร์ดรอปนะครับ 😎"
     },
 }
 
-# Activity ตอนรอส่งข้อความ
 WAITING_ACTIVITY = "Developer By BoonHome"
 
-# ฟังก์ชันตั้ง Activity แบบ Competing
 async def set_activity(text=WAITING_ACTIVITY):
-    activity = discord.Activity(
-        type=discord.ActivityType.competing,
-        name=text
-    )
+    activity = discord.Activity(type=discord.ActivityType.competing, name=text)
     await bot.change_presence(status=discord.Status.online, activity=activity)
 
-# ฟังก์ชันส่งข้อความและเปลี่ยน Activity
 async def send_message(category: str):
     data = MESSAGES.get(category)
     if not data:
         return
-
-    # เปลี่ยน Activity ตามหมวด
     await set_activity(data["activity"])
-
     channel = bot.get_channel(CHANNEL_ID)
     if channel:
         embed = discord.Embed(description=data["text"], color=data["color"])
         embed.set_image(url=data["image"])
         await channel.send(embed=embed)
-        print(f"[{datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S')}] ✅ Message sent ({category}) to {channel.name}")
-
-    # กลับไป Activity ตอนรอส่งข้อความ
+        print(f"[{datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S')}] ✅ Message sent ({category})")
     await set_activity(WAITING_ACTIVITY)
 
-# คำสั่ง Discord
+# 🔔 แจ้งเตือนสมาชิกเข้า
+@bot.event
+async def on_member_join(member):
+    channel = bot.get_channel(JOIN_CHANNEL_ID or CHANNEL_ID)
+    if channel:
+        embed = discord.Embed(
+            title="🎉 สมาชิกใหม่เข้าร่วมเซิร์ฟเวอร์!",
+            description=f"ยินดีต้อนรับ {member.mention} เข้าสู่ **{member.guild.name}** 💫",
+            color=0x57F287,
+            timestamp=datetime.now(tz)
+        )
+        embed.set_thumbnail(url=member.display_avatar.url)
+        await channel.send(embed=embed)
+        print(f"[{datetime.now(tz)}] ✅ {member} เข้าร่วมเซิร์ฟเวอร์")
+
+# 🔕 แจ้งเตือนสมาชิกออก
+@bot.event
+async def on_member_remove(member):
+    channel = bot.get_channel(LEAVE_CHANNEL_ID or CHANNEL_ID)
+    if channel:
+        embed = discord.Embed(
+            title="👋 สมาชิกออกจากเซิร์ฟเวอร์",
+            description=f"{member.name} ได้ออกจาก **{member.guild.name}**",
+            color=0xED4245,
+            timestamp=datetime.now(tz)
+        )
+        embed.set_thumbnail(url=member.display_avatar.url)
+        await channel.send(embed=embed)
+        print(f"[{datetime.now(tz)}] ❌ {member} ออกจากเซิร์ฟเวอร์")
+
+# --- คำสั่ง Discord เดิม ---
 @bot.command()
 async def sendnow(ctx, category: str = "vehicle"):
     if category not in MESSAGES:
@@ -79,37 +98,13 @@ async def sendnow(ctx, category: str = "vehicle"):
     await ctx.send(f"✅ ส่งข้อความหมวด '{category}' เรียบร้อยแล้ว!")
 
 @bot.command()
-async def next(ctx, category: str = None):
-    now = datetime.now(tz)
-    jobs = scheduler.get_jobs()
-    upcoming = []
-    for job in jobs:
-        if category:
-            if job.args[0] == category and job.next_run_time and job.next_run_time > now:
-                upcoming.append(job.next_run_time)
-        else:
-            if job.next_run_time and job.next_run_time > now:
-                upcoming.append(job.next_run_time)
-    if upcoming:
-        next_time = min(upcoming)
-        await ctx.send(f"🕒 ข้อความถัดไปจะถูกส่งเวลา `{next_time.strftime('%H:%M %d/%m/%Y')}` (เวลาไทย)")
-    else:
-        await ctx.send("❌ ยังไม่มีงานที่ตั้งเวลาไว้")
-
-@bot.command()
 async def status(ctx):
-    await ctx.send(f"✅ บอททำงานอยู่ตอนนี้ ({datetime.now(tz).strftime('%H:%M:%S %d/%m/%Y')})")
+    await ctx.send(f"✅ บอททำงานอยู่ ({datetime.now(tz).strftime('%H:%M:%S %d/%m/%Y')})")
 
-# เมื่อ bot พร้อม
 @bot.event
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
-
-    # ตั้ง Activity ตอนรอ
     await set_activity(WAITING_ACTIVITY)
-    print(f"🎮 Bot Streaming activity set: {WAITING_ACTIVITY}")
-
-    # ตั้ง scheduler หลัง bot พร้อม
     for cat, info in MESSAGES.items():
         for t in info["times"]:
             hour, minute = map(int, t.split(":"))
@@ -120,7 +115,6 @@ async def on_ready():
                 coalesce=True,
                 misfire_grace_time=60
             )
-
     scheduler.start()
     print("🕒 Scheduler started. Waiting for next job...")
 
