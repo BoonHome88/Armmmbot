@@ -26,14 +26,14 @@ MESSAGES = {
     "vehicle": {
         "text": "# แจ้งเตือนลบยานพาหนะ\n**ชาวเมืองทุกท่านอย่าลืมขึ้นยานพาหนะของท่านนะครับ**\n<@&1419750622517006393> <@&1419750622517006394>",
         "image": "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmdhczI2dHVrZnQ0a2wzeXJkbXd3YXBtYTVmMzZseGJrN3Nka3NhMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/feOLsVVsYft04/giphy.gif",
-        "times": ["10:29", "14:29", "22:29", "03:29"],
+        "times": ["10:30", "14:30", "22:30", "03:30"],
         "color": 0xffb658,
         "activity": "กำลังจะลบรถนะครับทุกคน 🚗"
     },
     "Airdrop": {
         "text": "# แจ้งเตือนเข้า Airdrop ครับเพื่อนๆ\n**ชาวเมืองทุกท่านระวังโดนปรับนะครับ**\n<@&1419750622517006393> <@&1419750622517006394>",
         "image": "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2UyeWl2aXVjemQ5ZHpxaDQ4M3MwdzI4ZG5xaGVpb3djNDRrN2R4MyZlcD12MV9pbnRlcm5hbF9naWQmY3Q9Zw/ne3qb8GHvteK4QGtbs/giphy.gif",
-        "times": ["19:50", "19:59", "22:50", "22:59"],
+        "times": ["19:55", "20:00", "22:55", "23:00"],
         "color": 0xff5858,
         "activity": "กำลังรอสมาชิกเข้าแอร์ดรอปนะครับ 😎"
     },
@@ -42,12 +42,13 @@ MESSAGES = {
 # Activity ตอนรอส่งข้อความ
 WAITING_ACTIVITY = "Developer By BoonHome"
 
-# URL สำหรับ Streaming Activity
-STREAM_URL = "https://www.twitch.tv/boonhomelive"
-
-# ฟังก์ชันตั้ง Activity แบบ Streaming
-async def set_activity(text, url=STREAM_URL):
-    await bot.change_presence(activity=discord.Streaming(name=text, url=url))
+# ฟังก์ชันตั้ง Activity แบบ Competing
+async def set_activity(text=WAITING_ACTIVITY):
+    activity = discord.Activity(
+        type=discord.ActivityType.competing,
+        name=text
+    )
+    await bot.change_presence(status=discord.Status.online, activity=activity)
 
 # ฟังก์ชันส่งข้อความและเปลี่ยน Activity
 async def send_message(category: str):
