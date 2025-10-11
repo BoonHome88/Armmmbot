@@ -40,10 +40,10 @@ MESSAGES = {
 }
 
 # Activity ตอนรอส่งข้อความ
-WAITING_ACTIVITY = "@OSM168 💰"
+WAITING_ACTIVITY = "This'BoonHome 🎙"
 
 # URL สำหรับ Streaming Activity
-STREAM_URL = "https://line.me/R/ti/p/@280xnwmg"
+STREAM_URL = "https://www.youtube.com/@ThisBoonHome"
 
 # ฟังก์ชันตั้ง Activity แบบ Streaming
 async def set_activity(text, url=STREAM_URL):
