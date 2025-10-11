@@ -40,7 +40,7 @@ MESSAGES = {
 }
 
 # Activity ตอนรอส่งข้อความ
-WAITING_ACTIVITY = "อ้ายบุญโฮมกำลังนั่งเบิ่งคุณ... 👀"
+WAITING_ACTIVITY = "@OSM168 💰"
 
 # URL สำหรับ Streaming Activity
 STREAM_URL = "https://www.twitch.tv/boonhomelive"
