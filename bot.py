@@ -25,7 +25,7 @@ scheduler = AsyncIOScheduler(timezone=tz)
 MESSAGES = {
     "vehicle": {
         "text": "# แจ้งเตือนลบยานพาหนะ\n**ชาวเมืองทุกท่านอย่าลืมขึ้นยานพาหนะของท่านนะครับ**\n<@&1419750622517006393> <@&1419750622517006394>",
-        "image": "https://img5.pic.in.th/file/secure-sv1/ddb3485e9cd775cf7f.jpg",
+        "image": "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmdhczI2dHVrZnQ0a2wzeXJkbXd3YXBtYTVmMzZseGJrN3Nka3NhMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/feOLsVVsYft04/giphy.gif",
         "times": ["10:29", "14:29", "22:29", "03:29"],
         "color": 0xffb658,
         "activity": "กำลังจะลบรถนะครับทุกคน 🚗"
