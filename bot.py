@@ -119,6 +119,14 @@ async def sendnow(ctx, category: str = "vehicle"):
     await ctx.send(f"✅ ส่งข้อความหมวด '{category}' เรียบร้อยแล้ว!")
 
 @bot.command()
+async def sendnow(ctx, category: str = "vehicle1"):
+    if category not in MESSAGES:
+        await ctx.send(f"❌ หมวด '{category}' ไม่มีอยู่")
+        return
+    await send_message(category)
+    await ctx.send(f"✅ ส่งข้อความหมวด '{category}' เรียบร้อยแล้ว!")
+
+@bot.command()
 async def status(ctx):
     await ctx.send(f"✅ บอททำงานอยู่ ({datetime.now(tz).strftime('%H:%M:%S %d/%m/%Y')})")
 
