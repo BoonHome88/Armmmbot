@@ -47,7 +47,7 @@ MESSAGES = {
     "vehicle0": {
         "text": "# แจ้งเตือน ระบบกำลังลบยานพาหนะ\n**รถลบ เรือลบ ก็ช่างหัวโคตรพ่อมึงโคตรแม่มึง หากลับเอาเองว่ะ**\n<@&1419750622517006393> <@&1419750622517006394>",
         "image": "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHpkdnZnbGlodmt5N25mYWY3Z2Z4OHo4aXY0d21qanJzMzltaXBncyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/d2jjuAZzDSVLZ5kI/giphy.gif",
-        "times": ["10:40", "14:40", "22:40", "03:40"],
+        "times": ["10:39", "14:39", "22:39", "03:39"],
         "color": 0xDCDCDC,
         "activity": "ระบบลบยานพาหนะเสร็จสิ้นแล้ว ✅"
     },
@@ -68,7 +68,7 @@ MESSAGES = {
     "Airdrop1": {
         "text": "# แจ้งเตือน ระบบเปิด Airdrop ให้เข้าเรียบร้อยแล้ว\n**โดนปรับก็ช่างหัวโคตรพ่อมึงโคตรแม่มึงนะครับ ตามหลายเทื่อละ**\n<@&1419750622517006393> <@&1419750622517006394>",
         "image": "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3Y4eTFvN3d1NXpkbmsxMWFyM2lzeDNrNzkxOXdpejRjcm8xOW02MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/1KhjvfXgXcYxS0cuG0/giphy.gif",
-        "times": ["20:00","23:00"],
+        "times": ["19:59","22:59"],
         "color": 0x4682B4,
         "activity": "พร้อมปรับคนที่ขาด Airdrop แล้ว ✅"
     },
