@@ -118,6 +118,8 @@ async def status(ctx):
 
 @bot.event
 async def on_ready():
+channel = bot.get_channel(1419750625117343923)
+await channel.send("🤖 บอทพร้อมทำงานแล้ว!")
     print(f"✅ Logged in as {bot.user}")
     await set_activity(WAITING_ACTIVITY)
     for cat, info in MESSAGES.items():
